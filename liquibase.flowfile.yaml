@@ -1,0 +1,64 @@
+# globalVariables:
+#   LIQUIBASE_COMMAND_CHANGELOG_FILE: outputScript.sql
+
+stages:
+
+  Status:
+    actions:
+
+    - type: liquibase
+      command: status
+
+    - type: control
+      if: "status.changesetCount == 0"
+      command: exit
+      cmdArgs: {
+        exitStatus: 0,
+        message: "Exiting because the database is up-to-date."
+      }
+  
+  # Snapshot-Before:
+  #   actions:
+  #   - type: liquibase
+  #     command: snapshot
+  #     cmdArgs: { snapshot-format: "json" }
+  #     globalArgs: { output-file: "output/SNAPSHOT.json" }
+
+  Drift_Detection:
+    actions:
+      - type: liquibase
+        command: diff
+        cmdArgs: { 
+          # url: "offline:sqlserver?snapshot=output/SNAPSHOT-BEFORE.json",
+          reference-url: "offline:sqlserver?snapshot=output/SNAPSHOT.json", 
+          # reference-url: "jdbc:sqlserver://demo-db1-win.liquibase.net:1433;databaseName=NPT_QA;encrypt=false",
+          diff-types: "catalogs, checkconstraints, columns, data, databasepackage, databasepackagebody, foreignkeys, functions, indexes, primarykeys, sequences, storedprocedures, tables, triggers, uniqueconstraints, views",
+          # diff-types: "storedprocedures",
+          drift-severity-changed: "0",
+          drift-severity-missing: "2",
+          drift-severity-unexpected: "2"
+        }
+        globalArgs: {
+          mirror-console-messages-to-log: "true",
+          reports-enabled: "true",
+          reports-path: "output",
+          reports-name: "drift-report.html"
+        }
+
+  # Update:
+  #   actions:
+  #   - type: liquibase
+  #     command: update
+
+  Snapshot-After:
+    actions:
+    - type: liquibase
+      command: snapshot
+      cmdArgs: { snapshot-format: "json" }
+      globalArgs: { output-file: "output/SNAPSHOT.json" }
+
+
+endStage:
+  actions:
+  - type: liquibase
+    command: history
