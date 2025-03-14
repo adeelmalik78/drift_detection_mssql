@@ -8,4 +8,4 @@ create table contractor (
     address2 varchar(50),
     city varchar(30)
 )
-
+--rollback drop table contractor

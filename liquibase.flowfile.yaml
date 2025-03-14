@@ -28,9 +28,8 @@ stages:
     actions:
       - type: liquibase
         command: diff
-        cmdArgs: { 
-          # url: "offline:sqlserver?snapshot=output/SNAPSHOT-BEFORE.json",
-          reference-url: "offline:sqlserver?snapshot=output/SNAPSHOT.json", 
+        cmdArgs: {
+          # reference-url: "offline:sqlserver?snapshot=output/SNAPSHOT.json", 
           # reference-url: "jdbc:sqlserver://demo-db1-win.liquibase.net:1433;databaseName=NPT_QA;encrypt=false",
           diff-types: "catalogs, checkconstraints, columns, data, databasepackage, databasepackagebody, foreignkeys, functions, indexes, primarykeys, sequences, storedprocedures, tables, triggers, uniqueconstraints, views",
           # diff-types: "storedprocedures",
@@ -50,12 +49,12 @@ stages:
   #   - type: liquibase
   #     command: update
 
-  Snapshot-After:
-    actions:
-    - type: liquibase
-      command: snapshot
-      cmdArgs: { snapshot-format: "json" }
-      globalArgs: { output-file: "output/SNAPSHOT.json" }
+  # Snapshot-After:
+  #   actions:
+  #   - type: liquibase
+  #     command: snapshot
+  #     cmdArgs: { snapshot-format: "json" }
+  #     globalArgs: { output-file: "output/SNAPSHOT.json" }
 
 
 endStage:
